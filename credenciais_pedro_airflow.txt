@@ -1,0 +1,7 @@
+docker compose run airflow-webserver airflow users create \
+    --username pedro\
+    --password senha \
+    --firstname pedro \
+    --lastname cruz \
+    --role Admin \
+    --email pedrocm123@usp.br

@@ -1,0 +1,61 @@
+# Arquivo: SEADE_EXTRACOES/docker-compose.yaml
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      # Use o volume nomeado para o PostgreSQL
+      - pgdata_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  airflow-webserver:
+    image: airflow_teste:latest
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data
+    environment:
+      - AIRFLOW__WEBSERVER__SECRET_KEY=sua_chave_secreta_aqui
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    command: webserver
+
+    
+  airflow-scheduler:
+    image: airflow_teste:latest
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    command: scheduler
+
+# Seção de volumes nomeados (ADICIONE ESTA PARTE)
+volumes:
+  pgdata_volume:
