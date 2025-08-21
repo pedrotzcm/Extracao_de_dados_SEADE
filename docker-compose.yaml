@@ -1,7 +1,4 @@
-# Arquivo: SEADE_EXTRACOES/docker-compose.yaml
-
 version: '3.8'
-
 services:
   postgres:
     image: postgres:13
@@ -12,7 +9,6 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # Use o volume nomeado para o PostgreSQL
       - pgdata_volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
@@ -34,12 +30,11 @@ services:
       - ./scripts:/opt/airflow/scripts
       - ./data:/opt/airflow/data
     environment:
-      - AIRFLOW__WEBSERVER__SECRET_KEY=sua_chave_secreta_aqui
+      - AIRFLOW__WEBSERVER__SECRET_KEY=b'\x94\x82%\xee\xc7\xa1a\x9a(\t\x9fB^\xed\xd6\x06'
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     command: webserver
 
-    
   airflow-scheduler:
     image: airflow_teste:latest
     container_name: airflow-scheduler
@@ -56,6 +51,17 @@ services:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     command: scheduler
 
-# Seção de volumes nomeados (ADICIONE ESTA PARTE)
+  streamlit:
+    image: python:3.10-slim
+    container_name: streamlit-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./dashboard.py:/app/dashboard.py
+      - ./requirements_streamlit.txt:/app/requirements_streamlit.txt
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir -r requirements_streamlit.txt && streamlit run dashboard.py"
+
 volumes:
   pgdata_volume:
