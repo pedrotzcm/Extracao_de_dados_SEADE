@@ -1,0 +1,16 @@
+# Segredos e chaves
+credenciais_pedro_airflow.txt
+file_save_github
+file_save_github.pub
+
+# Ambientes virtuais e dependências
+venv
+*.pyc
+__pycache__/
+
+# Dados locais e de banco de dados
+data/
+pgdata/
+
+# Outros arquivos temporários
+.DS_Store
