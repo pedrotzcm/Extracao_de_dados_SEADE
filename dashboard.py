@@ -23,88 +23,72 @@ def convert_df_to_csv(df):
 @st.cache_data
 def load_and_process_data(file_path):
     """
-    Carrega, limpa e processa os dados de um arquivo CSV local.
+    Carrega, limpa e processa os dados de um arquivo CSV ou XLSX local.
     """
     try:
-        # Ler os dados diretamente do arquivo CSV
-        df = pd.read_csv(file_path)
+        if file_path.endswith('.csv'):
+            df = pd.read_csv(file_path)
+        elif file_path.endswith('.xlsx'):
+            df = pd.read_excel(file_path)
+        else:
+            st.error("Formato de arquivo não suportado. Use .csv ou .xlsx.")
+            return pd.DataFrame()
 
-        # Retornar o DataFrame processado
         return df
 
     except Exception as e:
-        st.error(f"Ocorreu um erro ao carregar ou processar os dados do arquivo CSV: {e}")
+        st.error(f"Ocorreu um erro ao carregar ou processar os dados de {file_path}: {e}")
         return pd.DataFrame()
-    
-# --- Carregamento dos Dados ---
-# O Streamlit irá ler o arquivo salvo pelo Airflow
-data_dir = os.path.join(os.getcwd(), "data")
-file_name = "ibge_pimpf.csv" # O nome do arquivo salvo pelo Airflow
-file_path = os.path.join(data_dir, file_name)
 
-if os.path.exists(file_path):
-    df = load_and_process_data(file_path)
-else:
-    df = pd.DataFrame()
-    st.warning("Arquivo de dados não encontrado. Por favor, execute a DAG do Airflow.")
+# --- Configuração dos Arquivos a Serem Carregados ---
+data_dir = os.path.join(os.getcwd(), "data", "raw")
 
+# Mapeie o nome de exibição para o nome do arquivo
+arquivos_para_carregar = {
+    "PIMPF (IBGE)": "ibge_pimpf.csv",
+    "Serviços (IBGE)": "ibge_servicos.csv",
+    "Sinapi (IBGE)": "ibge_sinapi.csv",
+    "Leite (IBGE)": "ibge_leite.csv",
+    "Ovos (IBGE)": "ibge_ovos.csv",
+    "Caged": "caged.xlsx",
+    "Conab": "conab_scraping.csv",
+    "IEA": "iea_scraping.csv"
+}
 
 # --- Título e Métricas do Dashboard ---
-st.title('🏭 Dashboard da Produção Industrial (IBGE/SIDRA)')
+st.title('📊 Dashboard de Dados Econômicos')
 st.markdown("---")
 
-if not df.empty:
-    # Exibe a data e hora da "obtenção" dos dados
-    data_obtencao = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-    st.info(f"**Data de atualização:** {data_obtencao}")
+# Exibe a data de atualização
+data_obtencao = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+st.info(f"**Data de atualização:** {data_obtencao}")
 
-    # Exibe o total de linhas do DataFrame em um cartão de métrica
-    total_linhas = len(df)
-    st.metric(label="Total de Registros (PIMPF)", value=total_linhas)
+# --- Carregamento e Exibição das Tabelas em Loop ---
+for nome_tabela, nome_arquivo in arquivos_para_carregar.items():
+    file_path = os.path.join(data_dir, nome_arquivo)
 
-    st.markdown("---")
+    if os.path.exists(file_path):
+        df = load_and_process_data(file_path)
+        
+        if not df.empty:
+            st.subheader(f'Dados: {nome_tabela}')
+            
+            # Exibe o número de registros em cada tabela
+            st.metric(label=f"Total de Registros ({nome_tabela})", value=len(df))
+            
+            st.dataframe(df, use_container_width=True)
 
-    # --- Exibição dos Dados e Botão de Download do CSV ---
-    st.subheader('Dados do PIMPF - São Paulo')
-    st.dataframe(df, use_container_width=True)
+            csv_data = convert_df_to_csv(df)
 
-    csv_data = convert_df_to_csv(df)
-
-    st.download_button(
-       label="📥 Baixar dados em CSV",
-       data=csv_data,
-       file_name=file_name,
-       mime='text/csv',
-       help='Clique para baixar o arquivo CSV com os dados da tabela acima.'
-    )
-
-    st.markdown("---")
-    
-    # --- Geração do Gráfico e Botão de Download da Imagem ---
-    st.subheader('Evolução do Índice Industrial')
-
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.plot(df['Mês'], df['Valor'], marker='o', linestyle='-', color='royalblue')
-    ax.set_xlabel('Mês')
-    ax.set_ylabel('Valor do Índice')
-    ax.set_title('Evolução do Índice PIMPF')
-    ax.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.xticks(rotation=45, ha="right")
-    plt.tight_layout()
-
-    st.pyplot(fig)
-
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=300, bbox_inches='tight')
-    buf.seek(0)
-
-    st.download_button(
-       label="🖼️ Baixar gráfico como PNG",
-       data=buf,
-       file_name="grafico_pimpf.png",
-       mime="image/png",
-       help='Clique para baixar a imagem do gráfico.'
-    )
-
-else:
-    st.warning("Não foi possível carregar os dados. Execute a DAG do Airflow e recarregue a página.")
+            st.download_button(
+                label=f"📥 Baixar {nome_tabela} em CSV",
+                data=csv_data,
+                file_name=nome_arquivo.replace('.xlsx', '.csv'),
+                mime='text/csv',
+                help='Clique para baixar os dados.'
+            )
+            st.markdown("---")
+        else:
+            st.warning(f"Não foi possível carregar os dados de **{nome_tabela}**.")
+    else:
+        st.warning(f"Arquivo **{nome_arquivo}** não encontrado. Execute a DAG para obtê-lo.")

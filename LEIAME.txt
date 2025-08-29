@@ -16,4 +16,4 @@ docker compose run airflow-webserver airflow users create \
 docker compose run airflow-webserver airflow db init
 
 
-Com esses comandos rodados, acesse http://localhost:8080
+Com esses comandos rodados, acesse http://localhost:8080 para entrar na interface do airflow e http://localhost:8501/ para entrar na interface do streamlit
