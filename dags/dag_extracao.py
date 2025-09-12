@@ -19,7 +19,8 @@ from extracoes_dados import (
     extrair_caged_mte,
     extrair_iea,
     extrair_conab,
-    extrair_bacen
+    extrair_bacen,
+    extrair_anp
 )
 
 # Diretório de saída dos arquivos
@@ -43,7 +44,7 @@ with DAG(
     schedule_interval='@daily',
     start_date=days_ago(1),
     catchup=False,
-    tags=['ibge', 'seade', 'extracao', 'etl'],
+    tags=['ibge', 'seade', 'extracao', 'etl', 'caged', 'iea', 'conab', 'bacen', 'anp'],
 ) as dag:
 
     t1_extracao_ibge_2296 = PythonOperator(
@@ -67,7 +68,7 @@ with DAG(
     t4_extrair_caged = PythonOperator(
         task_id='extrair_caged_mte',
         python_callable=extrair_caged_mte,
-        op_kwargs={'output_path': os.path.join(output_dir, 'caged.xlsx')}
+        op_kwargs={'output_path': os.path.join(output_dir, 'caged.csv')}
     )
 
     t5_extrair_iea = PythonOperator(
@@ -105,8 +106,16 @@ with DAG(
         python_callable=extrair_ibge_tabela_647,
         op_kwargs={'output_path': os.path.join(output_dir, 'ibge_custo_m2.csv')}
     )
+    
+
+    
+    t11_extracao_anp = PythonOperator(
+        task_id='extrair_anp',
+        python_callable=extrair_anp,
+        op_kwargs={'output_path': os.path.join(output_dir, 'anp_data.csv')}
+    )
 
     # Definir a ordem das tarefas
     [t1_extracao_ibge_2296, t2_extracao_ibge_8693, t3_extracao_ibge_8888, t4_extrair_caged, 
      t5_extrair_iea, t6_extrair_conab, t7_extrair_bacen, t8_extracao_ibge_leite,
-     t9_extracao_ibge_ovos, t10_extracao_ibge_custo_m2]
+     t9_extracao_ibge_ovos, t10_extracao_ibge_custo_m2, t11_extracao_anp]
