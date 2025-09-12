@@ -50,9 +50,10 @@ arquivos_para_carregar = {
     "Sinapi (IBGE)": "ibge_sinapi.csv",
     "Leite (IBGE)": "ibge_leite.csv",
     "Ovos (IBGE)": "ibge_ovos.csv",
-    "Caged": "caged.xlsx",
+    "Caged": "caged.csv",
     "Conab": "conab_scraping.csv",
-    "IEA": "iea_scraping.csv"
+    "IEA": "iea_scraping.csv",
+    "ANP": "anp_data.csv"
 }
 
 # --- Título e Métricas do Dashboard ---
