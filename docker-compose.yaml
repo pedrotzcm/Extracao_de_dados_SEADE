@@ -33,7 +33,23 @@ services:
       - AIRFLOW__WEBSERVER__SECRET_KEY=b'\x94\x82%\xee\xc7\xa1a\x9a(\t\x9fB^\xed\xd6\x06'
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__PARALLELISM=4
+      - AIRFLOW__CORE__DAG_CONCURRENCY=4
+      - AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG=1
+      - AIRFLOW__SCHEDULER__MAX_TIS_PER_QUERY=4
+
+
     command: webserver
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 2g
+        reservations:
+          cpus: "0.50"
+          memory: 512m
+
 
   airflow-scheduler:
     image: airflow_teste:latest
@@ -50,6 +66,14 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     command: scheduler
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 2g
+        reservations:
+          cpus: "0.50"
+          memory: 512m
 
   streamlit:
     image: python:3.10-slim
@@ -62,6 +86,14 @@ services:
       - ./requirements_streamlit.txt:/app/requirements_streamlit.txt
     working_dir: /app
     command: sh -c "pip install --no-cache-dir -r requirements_streamlit.txt && streamlit run dashboard.py"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 2g
+        reservations:
+          cpus: "0.50"
+          memory: 512m
 
 volumes:
   pgdata_volume:

@@ -1049,3 +1049,9 @@ Nível Territorial (Código),Nível Territorial,Unidade de Medida (Código),Unid
 3,Unidade da Federação,2,%,..,35,São Paulo,202507,julho 2025,11624,PMS - Variação mês/mesmo mês do ano anterior (M/M-12),0,,107071,Total
 3,Unidade da Federação,2,%,..,35,São Paulo,202507,julho 2025,11625,PMS - Variação acumulada no ano (em relação ao mesmo período do ano anterior),0,,107071,Total
 3,Unidade da Federação,2,%,..,35,São Paulo,202507,julho 2025,11626,PMS - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses),0,,107071,Total
+3,Unidade da Federação,30,Número-índice,..,35,São Paulo,202508,agosto 2025,7167,PMS - Número-índice (2022=100),0,,107071,Total
+3,Unidade da Federação,30,Número-índice,..,35,São Paulo,202508,agosto 2025,7168,PMS - Número-índice com ajuste sazonal (2022=100),0,,107071,Total
+3,Unidade da Federação,2,%,..,35,São Paulo,202508,agosto 2025,11623,"PMS - Variação mês/mês imediatamente anterior, com ajuste sazonal (M/M-1)",0,,107071,Total
+3,Unidade da Federação,2,%,..,35,São Paulo,202508,agosto 2025,11624,PMS - Variação mês/mesmo mês do ano anterior (M/M-12),0,,107071,Total
+3,Unidade da Federação,2,%,..,35,São Paulo,202508,agosto 2025,11625,PMS - Variação acumulada no ano (em relação ao mesmo período do ano anterior),0,,107071,Total
+3,Unidade da Federação,2,%,..,35,São Paulo,202508,agosto 2025,11626,PMS - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses),0,,107071,Total

@@ -1,0 +1,24 @@
+# Core do Python
+python-dotenv
+
+# ETL / Dados
+pandas
+polars
+pyarrow
+requests
+
+# Airflow (caso use localmente)
+apache-airflow
+
+# Scraping
+beautifulsoup4
+selenium
+webdriver-manager
+
+# OCR e Imagem
+opencv-python-headless
+pytesseract
+easyocr
+
+# Dashboard / Visualização
+streamlit

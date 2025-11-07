@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import io
 import os
+import json
 
 # --- Configuração da Página ---
 st.set_page_config(
@@ -40,6 +41,8 @@ def load_and_process_data(file_path):
         st.error(f"Ocorreu um erro ao carregar ou processar os dados de {file_path}: {e}")
         return pd.DataFrame()
 
+
+
 # --- Configuração dos Arquivos a Serem Carregados ---
 data_dir = os.path.join(os.getcwd(), "data", "raw")
 
@@ -55,6 +58,24 @@ arquivos_para_carregar = {
     "IEA": "iea_scraping.csv",
     "ANP": "anp_data.csv"
 }
+import glob, json, os
+DATA_DIR = os.getenv("DATA_DIR", os.path.join(os.getcwd(),"data"))
+meta_glob = os.path.join(DATA_DIR, "_meta", "*", "*.json")
+metadados = []
+for path in glob.glob(meta_glob):
+    try:
+        metadados.append(json.load(open(path, encoding="utf-8")))
+    except Exception:
+        pass
+# pegar o mais recente por dataset
+from collections import defaultdict
+latest = defaultdict(dict)
+for m in metadados:
+    k = m["dataset"]
+    if not latest.get(k) or m["run_id"] > latest[k]["run_id"]:
+        latest[k] = m
+# depois usar latest[nome_arquivo] ao exibir
+
 
 # --- Título e Métricas do Dashboard ---
 st.title('📊 Dashboard de Dados Econômicos')
@@ -73,8 +94,12 @@ for nome_tabela, nome_arquivo in arquivos_para_carregar.items():
         
         if not df.empty:
             st.subheader(f'Dados: {nome_tabela}')
+            info = next((m for m in metadados if m["dataset"] == nome_arquivo), None)
+
+            if info:
+                st.markdown("### ℹ️ Metadados do Dataset")
+                st.json(info)  
             
-            # Exibe o número de registros em cada tabela
             st.metric(label=f"Total de Registros ({nome_tabela})", value=len(df))
             
             st.dataframe(df, use_container_width=True)

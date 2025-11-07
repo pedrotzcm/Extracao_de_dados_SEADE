@@ -5,6 +5,7 @@ file_save_github.pub
 
 # Ambientes virtuais e dependências
 venv
+.venv
 *.pyc
 __pycache__/
 
